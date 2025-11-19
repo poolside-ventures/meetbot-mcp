@@ -1,0 +1,46 @@
+# Source files (only ship dist/)
+src/
+tsconfig.json
+tsconfig.test.json
+
+# Tests
+**/*.test.ts
+**/*.test.js
+__tests__/
+test-*.js
+test-*.sh
+
+# Development files
+.eslintrc.js
+jest.config.js
+examples/
+scripts/
+
+# Build files
+.DS_Store
+*.log
+.env
+.env.*
+
+# Deployment files
+Dockerfile
+.dockerignore
+.railwayignore
+railway.json
+DEPLOYMENT.md
+IMPLEMENTATION_SUMMARY.md
+
+# Git files
+.git
+.gitignore
+
+# Coverage
+coverage/
+.nyc_output/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+

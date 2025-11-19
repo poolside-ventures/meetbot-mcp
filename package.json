@@ -1,0 +1,70 @@
+{
+    "name": "@meetbot/mcp",
+    "version": "1.2.3",
+    "description": "Model Context Protocol (MCP) server for Meet.bot booking page API",
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+        "bin": {
+          "meetbot-mcp": "dist/cli.js",
+          "meetbot-mcp-http": "dist/cli-http.js",
+          "meetbot-mcp-streamable": "dist/cli-streamable.js"
+        },
+    "scripts": {
+        "build": "tsc",
+        "dev": "tsc --watch",
+        "start": "node dist/cli.js",
+        "start:http": "node dist/cli-http.js",
+        "start:streamable": "node dist/cli-streamable.js",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "lint": "eslint src/**/*.ts",
+        "lint:fix": "eslint src/**/*.ts --fix",
+        "clean": "rm -rf dist",
+        "prebuild": "npm run clean"
+    },
+    "keywords": [
+        "mcp",
+        "model-context-protocol",
+        "meetbot",
+        "booking",
+        "scheduling",
+        "calendar",
+        "api"
+    ],
+    "author": "Meet.bot Team",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://gitlab.com/meetbot/meetbot-mcp.git"
+    },
+    "bugs": {
+        "url": "https://gitlab.com/meetbot/meetbot-mcp/-/issues"
+    },
+    "homepage": "https://gitlab.com/meetbot/meetbot-mcp",
+    "dependencies": {
+        "@modelcontextprotocol/sdk": "^1.20.1",
+        "@types/express": "^5.0.3",
+        "axios": "^1.6.0",
+        "express": "^5.1.0",
+        "zod": "^3.22.0"
+    },
+    "devDependencies": {
+        "@types/jest": "^30.0.0",
+        "@types/node": "^20.0.0",
+        "@typescript-eslint/eslint-plugin": "^6.0.0",
+        "@typescript-eslint/parser": "^6.0.0",
+        "eslint": "^8.0.0",
+        "jest": "^29.0.0",
+        "ts-jest": "^29.0.0",
+        "typescript": "^5.0.0"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "files": [
+        "dist/**/*",
+        "README.md",
+        "LICENSE"
+    ]
+}
