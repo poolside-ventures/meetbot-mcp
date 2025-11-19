@@ -1,15 +1,15 @@
 {
     "name": "@meetbot/mcp",
-    "version": "1.2.3",
+    "version": "1.2.5",
     "description": "Model Context Protocol (MCP) server for Meet.bot booking page API",
     "type": "module",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
-        "bin": {
-          "meetbot-mcp": "dist/cli.js",
-          "meetbot-mcp-http": "dist/cli-http.js",
-          "meetbot-mcp-streamable": "dist/cli-streamable.js"
-        },
+    "bin": {
+        "meetbot-mcp": "dist/cli.js",
+        "meetbot-mcp-http": "dist/cli-http.js",
+        "meetbot-mcp-streamable": "dist/cli-streamable.js"
+    },
     "scripts": {
         "build": "tsc",
         "dev": "tsc --watch",

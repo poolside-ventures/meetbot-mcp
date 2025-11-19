@@ -9,13 +9,13 @@
 
 ## Pre-publish Checklist
 
-- [x] Version updated to 1.1.1
-- [x] Changelog updated
-- [x] README updated with production URL
-- [x] Code built successfully
-- [x] Tests passing
-- [x] Production deployment validated
-- [x] .npmignore configured
+- [ ] Version updated to 1.2.3
+- [ ] Changelog updated
+- [ ] README updated with production URL
+- [ ] Code built successfully
+- [ ] Tests passing
+- [ ] Production deployment validated
+- [ ] .npmignore/config files reviewed
 
 ## Verify Package Contents
 
@@ -25,7 +25,7 @@ npm pack --dry-run
 
 # Or create actual tarball
 npm pack
-tar -tzf meetbot-mcp-1.1.1.tgz
+tar -tzf meetbot-mcp-1.2.3.tgz
 ```
 
 ## Publish Steps
@@ -73,8 +73,8 @@ meetbot-mcp-http
 
 1. Tag the release in git:
 ```bash
-git tag v1.1.1
-git push origin v1.1.1
+git tag v1.2.3
+git push origin v1.2.3
 ```
 
 2. Create GitHub/GitLab release with changelog
@@ -86,18 +86,18 @@ git push origin v1.1.1
 ⚠️ Only use within 72 hours of publish
 
 ```bash
-npm unpublish @meetbot/mcp@1.1.1
+npm unpublish @meetbot/mcp@1.2.3
 ```
 
 ## Version Strategy
 
-- **Patch (1.1.x)**: Bug fixes, documentation updates
+- **Patch (1.2.x)**: Bug fixes, documentation updates
 - **Minor (1.x.0)**: New features, non-breaking changes
 - **Major (x.0.0)**: Breaking changes
 
 ## Current Version
 
-**1.1.1** - ES Module fixes and production deployment
+**1.2.3** - Streamable CLI + build cleanup
 
 ## Next Steps
 
