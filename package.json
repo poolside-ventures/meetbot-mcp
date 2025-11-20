@@ -1,6 +1,6 @@
 {
     "name": "@meetbot/mcp",
-    "version": "1.2.5",
+    "version": "1.2.6",
     "description": "Model Context Protocol (MCP) server for Meet.bot booking page API",
     "type": "module",
     "main": "dist/index.js",

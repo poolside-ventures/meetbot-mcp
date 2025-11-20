@@ -2,6 +2,19 @@
 
 A Model Context Protocol (MCP) server for the Meet.bot Booking Page API, enabling AI assistants to interact with scheduling and booking functionality.
 
+## What is this?
+
+This MCP server connects AI assistants (like Claude, ChatGPT, and others that support MCP) to your Meet.bot account, allowing them to schedule meetings on your behalf. Instead of manually copying booking links or checking your calendar, you can simply ask your AI assistant to "schedule a 30-minute meeting with John next week" and it will handle the booking through your MeetBot scheduling pages.
+
+**How it works:**
+1. Connect your MeetBot API token to the MCP server
+2. Configure your AI assistant to use this MCP server
+3. Ask your AI assistant to schedule meetings - it can check your availability, find time slots, and book meetings directly through your MeetBot account
+
+This is particularly useful for busy professionals who want to automate meeting scheduling and let their AI assistant manage their calendar intelligently.
+
+If you don't have an account, you can get one for free at https://meet.bot
+
 ## Features
 
 - **Complete API Coverage**: Implements all endpoints from the Meet.bot Booking Page API v1
@@ -12,7 +25,7 @@ A Model Context Protocol (MCP) server for the Meet.bot Booking Page API, enablin
 - **Health Checks**: Built-in health monitoring using the /v1/pages endpoint
 - **MCP Protocol Compliance**: Full Model Context Protocol server implementation
 - **Dual Mode Support**: Run locally (stdio) or remotely (HTTP/SSE)
-- **Production Deployed**: Live at https://meetbot-mcp-production.up.railway.app
+- **Production Deployed**: Live at https://mcp.meet.bot
 - **Production Ready**: Thoroughly tested and validated for production use
 
 ## Installation
@@ -162,9 +175,9 @@ curl -N -H "Authorization: Bearer YOUR_TOKEN" http://localhost:3000/sse
 
 **Production Testing:**
 ```bash
-# Test the live Railway deployment
+# Test the live deployment
 curl -H "Authorization: Bearer YOUR_TOKEN" \
-     https://meetbot-mcp-production.up.railway.app/health
+     https://mcp.meet.bot/health
 
 # Expected response:
 # {"status":"ok","service":"meetbot-mcp"}
@@ -174,7 +187,7 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 
 The HTTP server can be deployed to various platforms:
 
-- **Railway**: `railway up` ✅ **Live at https://meetbot-mcp-production.up.railway.app**
+- **Railway**: `railway up` ✅ **Live at https://mcp.meet.bot**
 - **Fly.io**: `fly launch && fly deploy`
 - **Google Cloud Run**: Container-based deployment
 - **AWS App Runner**: Container-based deployment
@@ -183,7 +196,7 @@ The HTTP server can be deployed to various platforms:
 **Example: Connecting to Production**
 ```bash
 # Your MCP client should connect to:
-# https://meetbot-mcp-production.up.railway.app/sse
+# https://mcp.meet.bot/sse
 
 # With Authorization header:
 # Authorization: Bearer <your-meetbot-api-token>
@@ -438,10 +451,15 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Changelog
 
+### 1.2.6
+- **Documentation Updates**: Updated production URL from Railway to https://mcp.meet.bot
+- **Enhanced README**: Added "What is this?" section explaining the MCP's purpose and how to use it for scheduling meetings through MeetBot accounts
+- **User Onboarding**: Added link to sign up for a free Meet.bot account
+
 ### 1.1.1
 - **ES Module Fix**: Fixed ES module compatibility for Railway and other Node.js deployments
 - **Import Extensions**: Added proper `.js` extensions to all relative imports
-- **Live Deployment**: Successfully deployed to Railway at https://meetbot-mcp-production.up.railway.app
+- **Live Deployment**: Successfully deployed to https://mcp.meet.bot
 - **Production Validated**: Confirmed working in production environment
 
 ### 1.1.0
