@@ -451,10 +451,18 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Changelog
 
+### 1.2.7
+- **Example Config Update**: Removed obsolete `MEETBOT_BASE_URL` from example configuration (base URL is hardcoded to https://meet.bot)
+
 ### 1.2.6
 - **Documentation Updates**: Updated production URL from Railway to https://mcp.meet.bot
 - **Enhanced README**: Added "What is this?" section explaining the MCP's purpose and how to use it for scheduling meetings through MeetBot accounts
 - **User Onboarding**: Added link to sign up for a free Meet.bot account
+
+### 1.2.5
+- **Jest Configuration**: Updated Jest configuration for ES module support
+- **Build Improvements**: Excluded test files from TypeScript compilation
+- **Publishing**: Refined publishing checklist and documentation
 
 ### 1.1.1
 - **ES Module Fix**: Fixed ES module compatibility for Railway and other Node.js deployments
