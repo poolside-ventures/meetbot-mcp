@@ -235,6 +235,80 @@ export class MeetbotMCPStreamable {
       next();
     });
 
+    // MCP server card (well-known discovery)
+    const serverCard = {
+      serverInfo: {
+        name: 'meetbot-mcp',
+        version: '1.2.3',
+        description: 'Meet.bot MCP Server for scheduling and booking. Lets AI agents check availability, get scheduling page info, and book meetings on your behalf.',
+      },
+      authentication: {
+        required: true,
+        schemes: ['bearer'],
+        instructions: 'Provide your Meet.bot API key as a Bearer token in the Authorization header: Authorization: Bearer <your-api-key>',
+      },
+      tools: [
+        {
+          name: 'get_scheduling_pages',
+          description: 'Get all scheduling pages for the authenticated user',
+          inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+        },
+        {
+          name: 'get_page_info',
+          description: 'Get information about a specific scheduling page',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              page: { type: 'string', description: 'The URL of the scheduling page' },
+            },
+            required: ['page'],
+            additionalProperties: false,
+          },
+        },
+        {
+          name: 'get_available_slots',
+          description: 'Get available booking slots for a scheduling page',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              page: { type: 'string', description: 'The URL of the scheduling page' },
+              count: { type: 'number', description: 'Maximum number of slots to return' },
+              start: { type: 'string', description: 'Start date in YYYY-MM-DD format' },
+              end: { type: 'string', description: 'End date in YYYY-MM-DD format' },
+              timezone: { type: 'string', description: 'Timezone in IANA format (e.g., America/New_York)' },
+              booking_link: { type: 'boolean', description: 'Include shareable booking links' },
+            },
+            required: ['page'],
+            additionalProperties: false,
+          },
+        },
+        {
+          name: 'book_meeting',
+          description: 'Book a new meeting slot',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              page: { type: 'string', description: 'The URL of the scheduling page' },
+              guest_email: { type: 'string', description: 'Email address of the guest' },
+              guest_name: { type: 'string', description: 'Name of the guest' },
+              notes: { type: 'string', description: 'Additional notes for the meeting' },
+              start: { type: 'string', description: 'Start time in ISO 8601 format' },
+            },
+            required: ['page', 'guest_email', 'guest_name', 'start'],
+            additionalProperties: false,
+          },
+        },
+        {
+          name: 'health_check',
+          description: 'Check if the Meet.bot API client is healthy and the Bearer token is valid',
+          inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+        },
+      ],
+    };
+    app.get('/.well-known/mcp/server-card.json', (_req: Request, res: Response) => {
+      res.type('application/json').json(serverCard);
+    });
+
     // MCP POST endpoint (naked path for dedicated MCP subdomain)
     app.post('/', async (req: Request, res: Response) => {
       const sessionId = req.headers['mcp-session-id'] as string;
