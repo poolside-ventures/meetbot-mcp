@@ -1,5 +1,5 @@
 ---
-name: meetbot-scheduling
+name: scheduling
 description: Schedule and book meetings using Meet.bot. Handles availability checks, booking flows, and shareable booking links via the Meet.bot MCP server at mcp.meet.bot
 license: MIT
 metadata:
