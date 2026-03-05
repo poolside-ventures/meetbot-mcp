@@ -46,16 +46,14 @@ npm install @meetbot/mcp
 npm install -g @meetbot/mcp
 ```
 
-### 2. Configure the MCP Server
+### 2. Authentication
 
-Configure the Meet.bot API client with your authentication token:
+Authentication is **not** a tool—it is connection-based:
 
-```typescript
-// Configure with bearer token
-await configure_meetbot({
-  authToken: "your_bearer_token_here"
-});
-```
+- **HTTP/SSE (remote, e.g. https://mcp.meet.bot)**: Send `Authorization: Bearer <your_api_token>` in the request headers when connecting. The server uses this token for all API calls in that session.
+- **Stdio (local)**: Set the `MEETBOT_AUTH_TOKEN` environment variable when starting the server (e.g. `MEETBOT_AUTH_TOKEN=your_token npx @meetbot/mcp`).
+
+There is no `configure_meetbot` or similar tool; the AI uses the tools below and auth is handled by the connection.
 
 ### 3. Use the Available Tools
 
@@ -238,21 +236,22 @@ This MCP server can be integrated with AI assistants like Claude, ChatGPT, and o
 
 #### Available MCP Tools
 
-The server exposes 6 tools for AI assistants:
+The server exposes 5 tools for AI assistants:
 
-1. **`configure_meetbot`** - Configure API connection
-2. **`get_scheduling_pages`** - List all scheduling pages
-3. **`get_page_info`** - Get page details
-4. **`get_available_slots`** - Find available time slots
-5. **`book_meeting`** - Book a meeting
-6. **`health_check`** - Verify API connectivity using /v1/pages endpoint
+1. **`get_scheduling_pages`** - List all scheduling pages
+2. **`get_page_info`** - Get page details
+3. **`get_available_slots`** - Find available time slots
+4. **`book_meeting`** - Book a meeting
+5. **`health_check`** - Verify API connectivity using /v1/pages endpoint
+
+Authentication is provided by the connection (Bearer token in HTTP header for remote, or `MEETBOT_AUTH_TOKEN` for local stdio)—there is no separate configure tool.
 
 ### Testing and Validation
 
 The package has been thoroughly tested and validated:
 
 ✅ **MCP Protocol Compliance**: Full JSON-RPC 2.0 support
-✅ **Tool Discovery**: All 6 tools properly exposed
+✅ **Tool Discovery**: All 5 tools properly exposed
 ✅ **Error Handling**: Graceful error responses
 ✅ **Type Safety**: Complete TypeScript support
 ✅ **Schema Validation**: Input validation with Zod
@@ -376,9 +375,10 @@ meetbot-mcp
 
 ### Authentication
 
-The MCP server supports Bearer Token authentication:
+Auth is connection-based, not a tool:
 
-1. **Bearer Token**: Use `authToken` for API key authentication
+- **HTTP/SSE**: Send `Authorization: Bearer <token>` in request headers when connecting to the MCP server.
+- **Stdio**: Set `MEETBOT_AUTH_TOKEN` when running the server (e.g. `MEETBOT_AUTH_TOKEN=your_token meetbot-mcp`).
 
 ## Development
 

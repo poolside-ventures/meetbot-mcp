@@ -12,7 +12,7 @@ Successfully implemented HTTP/SSE transport for the Meet.bot MCP server, enablin
 - **Session Management**: Tracks active SSE connections and associated clients
 - **Bearer Token Authentication**: All endpoints require `Authorization: Bearer <token>` header
 - **Automatic Client Creation**: Creates `MeetbotClient` instance per session using the provided bearer token
-- **Tool Handlers**: Same 6 tools as stdio version (configure, get_pages, get_page_info, get_available_slots, book_meeting, health_check)
+- **Tool Handlers**: Same 5 tools as stdio version (get_pages, get_page_info, get_available_slots, book_meeting, health_check); auth is via Bearer header, not a configure tool
 
 ### 2. HTTP CLI Entry Point (`src/cli-http.ts`)
 

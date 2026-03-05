@@ -26,41 +26,6 @@ export class MeetbotMCPStreamable {
   }
 
   private setupToolHandlers(): void {
-    // Configure Meet.bot authentication tool
-    this.server.registerTool('configure_meetbot', {
-      title: 'Configure Meet.bot Authentication',
-      description: 'Configure Meet.bot API authentication (required before using other tools)',
-      inputSchema: {},
-    }, async (_, extra) => {
-      console.log('🔧 Configure Meetbot called for session:', extra.sessionId);
-      
-      if (!extra.sessionId) {
-        throw new Error('Session ID is required');
-      }
-      
-      // Check if client is already configured
-      const existingClient = this.clients.get(extra.sessionId);
-      if (existingClient) {
-        return {
-          content: [
-            {
-              type: 'text',
-              text: '✅ Meet.bot client is already configured and ready to use.',
-            },
-          ],
-        };
-      }
-      
-      return {
-        content: [
-          {
-            type: 'text',
-            text: '⚠️ Meet.bot client not configured. Please ensure the Authorization header is provided during connection.',
-          },
-        ],
-      };
-    });
-
     // Get scheduling pages tool
     this.server.registerTool('get_scheduling_pages', {
       title: 'Get Scheduling Pages',
@@ -77,7 +42,7 @@ export class MeetbotMCPStreamable {
       
       const client = this.clients.get(extra.sessionId);
       if (!client) {
-        throw new Error('Meet.bot client not configured. Please use configure_meetbot first.');
+        throw new Error('Meet.bot client not configured. Provide an Authorization: Bearer <token> header when connecting to the MCP server.');
       }
 
       const pages = await client.getPages();
@@ -115,7 +80,7 @@ export class MeetbotMCPStreamable {
       
       const client = this.clients.get(extra.sessionId);
       if (!client) {
-        throw new Error('Meet.bot client not configured. Please use configure_meetbot first.');
+        throw new Error('Meet.bot client not configured. Provide an Authorization: Bearer <token> header when connecting to the MCP server.');
       }
 
       if (!page) {
@@ -152,7 +117,7 @@ export class MeetbotMCPStreamable {
       
       const client = this.clients.get(extra.sessionId);
       if (!client) {
-        throw new Error('Meet.bot client not configured. Please use configure_meetbot first.');
+        throw new Error('Meet.bot client not configured. Provide an Authorization: Bearer <token> header when connecting to the MCP server.');
       }
 
       if (!page) {
@@ -196,7 +161,7 @@ export class MeetbotMCPStreamable {
       
       const client = this.clients.get(extra.sessionId);
       if (!client) {
-        throw new Error('Meet.bot client not configured. Please use configure_meetbot first.');
+        throw new Error('Meet.bot client not configured. Provide an Authorization: Bearer <token> header when connecting to the MCP server.');
       }
 
       if (!page || !guest_email || !guest_name || !start) {
@@ -232,7 +197,7 @@ export class MeetbotMCPStreamable {
       
       const client = this.clients.get(extra.sessionId);
       if (!client) {
-        throw new Error('Meet.bot client not configured. Please use configure_meetbot first.');
+        throw new Error('Meet.bot client not configured. Provide an Authorization: Bearer <token> header when connecting to the MCP server.');
       }
 
       const isHealthy = await client.healthCheck();

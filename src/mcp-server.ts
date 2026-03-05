@@ -17,7 +17,11 @@ export class MeetbotMCPServer {
         version: '1.0.0',
       }
     );
-
+    // Stdio mode: auth from environment (HTTP mode uses Bearer header)
+    const token = process.env['MEETBOT_AUTH_TOKEN'];
+    if (token) {
+      this.client = new MeetbotClient({ authToken: token });
+    }
     this.setupToolHandlers();
   }
 
@@ -26,20 +30,6 @@ export class MeetbotMCPServer {
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
       return {
         tools: [
-          {
-            name: 'configure_meetbot',
-            description: 'Configure the Meet.bot API client with authentication',
-            inputSchema: {
-              type: 'object',
-              properties: {
-                authToken: {
-                  type: 'string',
-                  description: 'Bearer token for authentication (optional)',
-                },
-              },
-              required: [],
-            },
-          },
           {
             name: 'get_scheduling_pages',
             description: 'Get all scheduling pages for the authenticated user',
@@ -144,9 +134,6 @@ export class MeetbotMCPServer {
 
       try {
         switch (name) {
-          case 'configure_meetbot':
-            return await this.handleConfigureMeetbot(args);
-
           case 'get_scheduling_pages':
             return await this.handleGetSchedulingPages(args);
 
@@ -179,34 +166,9 @@ export class MeetbotMCPServer {
     });
   }
 
-  private async handleConfigureMeetbot(args: any): Promise<any> {
-    if (!this.client) {
-      this.client = new MeetbotClient(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: 'Meet.bot API client configured successfully.',
-          },
-        ],
-      };
-    } else {
-      // Reconfigure existing client
-      this.client = new MeetbotClient(args);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: 'Meet.bot API client reconfigured successfully.',
-          },
-        ],
-      };
-    }
-  }
-
   private async handleGetSchedulingPages(_args: any): Promise<any> {
     if (!this.client) {
-      throw new Error('Meet.bot client not configured. Please run configure_meetbot first.');
+      throw new Error('Meet.bot client not configured. Set MEETBOT_AUTH_TOKEN when running the server (stdio mode), or use the HTTP server with Authorization: Bearer <token> header.');
     }
 
     const pages = await this.client.getPages();
@@ -227,7 +189,7 @@ export class MeetbotMCPServer {
 
   private async handleGetPageInfo(args: any): Promise<any> {
     if (!this.client) {
-      throw new Error('Meet.bot client not configured. Please run configure_meetbot first.');
+      throw new Error('Meet.bot client not configured. Set MEETBOT_AUTH_TOKEN when running the server (stdio mode), or use the HTTP server with Authorization: Bearer <token> header.');
     }
 
     const pageInfo = await this.client.getPageInfo(args);
@@ -243,7 +205,7 @@ export class MeetbotMCPServer {
 
   private async handleGetAvailableSlots(args: any): Promise<any> {
     if (!this.client) {
-      throw new Error('Meet.bot client not configured. Please run configure_meetbot first.');
+      throw new Error('Meet.bot client not configured. Set MEETBOT_AUTH_TOKEN when running the server (stdio mode), or use the HTTP server with Authorization: Bearer <token> header.');
     }
 
     const slots = await this.client.getSlots(args);
@@ -265,7 +227,7 @@ export class MeetbotMCPServer {
 
   private async handleBookMeeting(args: any): Promise<any> {
     if (!this.client) {
-      throw new Error('Meet.bot client not configured. Please run configure_meetbot first.');
+      throw new Error('Meet.bot client not configured. Set MEETBOT_AUTH_TOKEN when running the server (stdio mode), or use the HTTP server with Authorization: Bearer <token> header.');
     }
 
     const booking = await this.client.bookSlot(args);
@@ -281,7 +243,7 @@ export class MeetbotMCPServer {
 
   private async handleHealthCheck(_args: any): Promise<any> {
     if (!this.client) {
-      throw new Error('Meet.bot client not configured. Please run configure_meetbot first.');
+      throw new Error('Meet.bot client not configured. Set MEETBOT_AUTH_TOKEN when running the server (stdio mode), or use the HTTP server with Authorization: Bearer <token> header.');
     }
 
     const isHealthy = await this.client.healthCheck();

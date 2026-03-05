@@ -18,7 +18,7 @@ async function main(): Promise<void> {
     console.log(`  GET  /        → MCP server-to-client SSE stream`);
     console.log(`  DELETE /      → Terminate session`);
     console.log(`  GET  /health  → Health check`);
-    console.log(`\nAuthentication: Use configure_meetbot tool with your API token`);
+    console.log(`\nAuthentication: Send Authorization: Bearer <token> header when connecting`);
   });
 
   // Graceful shutdown

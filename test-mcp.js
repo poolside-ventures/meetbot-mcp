@@ -18,7 +18,8 @@ class MCPTester {
     console.log('🚀 Starting MCP server...');
 
     this.serverProcess = spawn('node', ['dist/cli.js'], {
-      stdio: ['pipe', 'pipe', 'pipe']
+      stdio: ['pipe', 'pipe', 'pipe'],
+      env: { ...process.env, MEETBOT_AUTH_TOKEN: process.env.MEETBOT_AUTH_TOKEN || 'test-token-123' }
     });
 
     // Wait a moment for server to start
@@ -74,26 +75,6 @@ class MCPTester {
     };
 
     this.sendRequest(listToolsRequest);
-    await setTimeout(1000);
-  }
-
-  async testConfigureMeetbot() {
-    console.log('\n⚙️ Testing configure_meetbot...');
-
-    const configureRequest = {
-      jsonrpc: "2.0",
-      id: this.requestId++,
-      method: "tools/call",
-      params: {
-        name: "configure_meetbot",
-        arguments: {
-          baseUrl: "https://api.meet.bot",
-          authToken: "test-token-123"
-        }
-      }
-    };
-
-    this.sendRequest(configureRequest);
     await setTimeout(1000);
   }
 
@@ -164,7 +145,6 @@ class MCPTester {
       this.setupResponseHandler();
 
       await this.testListTools();
-      await this.testConfigureMeetbot();
       await this.testHealthCheck();
       await this.testGetSchedulingPages();
 
