@@ -26,10 +26,11 @@ export class MeetbotMCPStreamable {
     this.setupPromptHandlers();
   }
 
-  /** Tool annotations for MCP/Smithery quality: audience and priority per spec */
+  /** Tool annotations for MCP/Smithery quality: audience, priority, lastModified per spec */
   private static readonly TOOL_ANNOTATIONS = {
     audience: ['user', 'assistant'] as const,
     priority: 0.8,
+    lastModified: '2025-03-05T00:00:00Z',
   };
 
   private setupToolHandlers(): void {
@@ -393,8 +394,12 @@ export class MeetbotMCPStreamable {
       next();
     });
 
-    // MCP server card (well-known discovery) – structured for Smithery quality (annotations, param descriptions, prompts)
-    const toolAnnotations = { audience: ['user', 'assistant'], priority: 0.8 };
+    // MCP server card (well-known discovery) – structured for Smithery Tool Quality (annotations, param descriptions, title)
+    const toolAnnotations = {
+      audience: ['user', 'assistant'],
+      priority: 0.8,
+      lastModified: '2025-03-05T00:00:00Z',
+    };
     const serverCard = {
       serverInfo: {
         name: 'meetbot-mcp',
@@ -409,15 +414,18 @@ export class MeetbotMCPStreamable {
       tools: [
         {
           name: 'get_scheduling_pages',
+          title: 'Get Scheduling Pages',
           description: 'Get all scheduling pages for the authenticated user',
           inputSchema: { type: 'object', properties: {}, additionalProperties: false },
           annotations: toolAnnotations,
         },
         {
           name: 'get_page_info',
+          title: 'Get Page Information',
           description: 'Get information about a specific scheduling page',
           inputSchema: {
             type: 'object',
+            description: 'Parameters for fetching a single scheduling page.',
             properties: {
               page: { type: 'string', description: 'The URL of the scheduling page (e.g. https://meet.bot/your-page)' },
             },
@@ -428,9 +436,11 @@ export class MeetbotMCPStreamable {
         },
         {
           name: 'get_available_slots',
+          title: 'Get Available Slots',
           description: 'Get available booking slots for a scheduling page',
           inputSchema: {
             type: 'object',
+            description: 'Parameters for querying available slots (optional filters for count, date range, timezone, and booking links).',
             properties: {
               page: { type: 'string', description: 'The URL of the scheduling page (e.g. https://meet.bot/your-page)' },
               count: { type: 'number', description: 'Maximum number of slots to return (defaults to server limit)' },
@@ -446,9 +456,11 @@ export class MeetbotMCPStreamable {
         },
         {
           name: 'book_meeting',
+          title: 'Book Meeting',
           description: 'Book a new meeting slot',
           inputSchema: {
             type: 'object',
+            description: 'Parameters for booking a meeting (guest details and chosen slot).',
             properties: {
               page: { type: 'string', description: 'The URL of the scheduling page (e.g. https://meet.bot/your-page)' },
               guest_email: { type: 'string', description: 'Email address of the guest (used for calendar invite and confirmation)' },
@@ -463,6 +475,7 @@ export class MeetbotMCPStreamable {
         },
         {
           name: 'health_check',
+          title: 'Health Check',
           description: 'Check if the Meet.bot API client is healthy and the Bearer token is valid',
           inputSchema: { type: 'object', properties: {}, additionalProperties: false },
           annotations: toolAnnotations,

@@ -451,6 +451,11 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Changelog
 
+### 1.2.9
+- **Server card**: Added `/.well-known/mcp/server-card.json` for discovery and manual metadata (tools, prompts, authentication)
+- **Smithery quality**: Tool annotations (`audience`, `priority`), richer parameter descriptions, and prompts capability for quality scoring
+- **Prompts (skills)**: Six MCP prompts for Smithery and clients: `schedule_meeting`, `check_availability`, `book_for_guest`, `share_booking_link`, `list_my_pages`, `suggest_times` with full `prompts/list` and `prompts/get` support
+
 ### 1.2.7
 - **Example Config Update**: Removed obsolete `MEETBOT_BASE_URL` from example configuration (base URL is hardcoded to https://meet.bot)
 
