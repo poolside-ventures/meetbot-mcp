@@ -14,7 +14,13 @@ export class MeetbotMCPServer {
     this.server = new Server(
       {
         name: 'meetbot-mcp',
-        version: '1.0.0',
+        version: '1.2.9',
+      },
+      {
+        // Declare the tools capability, otherwise the SDK rejects the
+        // tools/list + tools/call handlers below and the stdio server
+        // crashes on startup ("Server does not support tools").
+        capabilities: { tools: {} },
       }
     );
     // Stdio mode: auth from environment (HTTP mode uses Bearer header)
