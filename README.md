@@ -437,7 +437,7 @@ The MCP server provides detailed error messages for common issues:
 2. Create a feature branch
 3. Make your changes
 4. Add tests for new functionality
-5. Submit a merge request
+5. Submit a pull request
 
 ## License
 
@@ -446,8 +446,8 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## Support
 
 - **Documentation**: [https://docs.meet.bot](https://docs.meet.bot)
-- **Issues**: [GitLab Issues](https://gitlab.com/meetbot/meetbot-mcp/-/issues)
-- **Discussions**: [GitLab Discussions](https://gitlab.com/meetbot/meetbot-mcp/-/issues)
+- **Issues**: [GitHub Issues](https://github.com/poolside-ventures/meetbot-mcp/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/poolside-ventures/meetbot-mcp/discussions)
 
 ## Changelog
 
