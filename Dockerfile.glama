@@ -1,0 +1,32 @@
+# Glama introspection image.
+#
+# Glama builds this container and speaks MCP over stdio to run its
+# checks (initialize + tools/list). It must therefore launch the STDIO
+# server (dist/cli.js), not the HTTP server.
+#
+# The repo's main ./Dockerfile runs the HTTP server (dist/cli-http.js)
+# for the mcp.meet.bot deployment; this variant exists solely for
+# Glama's container-based checks. When submitting at
+# https://glama.ai/mcp/servers, point Glama at this Dockerfile.
+#
+# No MEETBOT_AUTH_TOKEN is needed: tools/list is served without auth
+# (a token is only required to actually call a tool).
+
+# Build stage
+FROM node:18-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+COPY tsconfig.json ./
+RUN npm ci
+COPY src ./src
+RUN npm run build
+
+# Production stage
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY --from=builder /app/dist ./dist
+
+# Stdio MCP server for Glama introspection.
+CMD ["node", "dist/cli.js"]
