@@ -541,6 +541,15 @@ export class MeetbotMCPStreamable {
       res.type('application/json').json(serverCard);
     });
 
+    // Glama directory ownership claim — Glama verifies the maintainer email
+    // against the claiming account, then unlocks listing metadata/control.
+    app.get('/.well-known/glama.json', (_req: Request, res: Response) => {
+      res.type('application/json').json({
+        $schema: 'https://glama.ai/mcp/schemas/glama.json',
+        maintainers: [{ email: 'vincent@meet.bot' }],
+      });
+    });
+
     // MCP POST endpoint (naked path for dedicated MCP subdomain)
     app.post('/', async (req: Request, res: Response) => {
       const sessionId = req.headers['mcp-session-id'] as string;
