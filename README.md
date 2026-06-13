@@ -451,6 +451,9 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Changelog
 
+### 1.2.10
+- **Fix (stdio startup crash)**: the stdio server (`npx @meetbot/mcp`) declared a tools handler without advertising the `tools` capability, so the MCP SDK threw "Server does not support tools" and the process exited on launch. Now declares `capabilities.tools`; the server boots and answers `initialize` + `tools/list` (no token needed for introspection).
+
 ### 1.2.9
 - **Server card**: Added `/.well-known/mcp/server-card.json` for discovery and manual metadata (tools, prompts, authentication)
 - **Smithery quality**: Tool annotations (`audience`, `priority`), richer parameter descriptions, and prompts capability for quality scoring

@@ -14,7 +14,7 @@ export class MeetbotMCPServer {
     this.server = new Server(
       {
         name: 'meetbot-mcp',
-        version: '1.2.9',
+        version: '1.2.10',
       },
       {
         // Declare the tools capability, otherwise the SDK rejects the
