@@ -8,12 +8,15 @@ import {
   Pages,
   Slots,
   MeetbotConfig,
+  Webhook,
+  SetWebhookRequest,
 } from './types.js';
 import {
   BookSlotRequestSchema,
   GetSlotsParamsSchema,
   GetInfoParamsSchema,
   MeetbotConfigSchema,
+  SetWebhookRequestSchema,
 } from './schemas.js';
 
 /**
@@ -95,6 +98,36 @@ export class MeetbotClient {
     const validatedRequest = BookSlotRequestSchema.parse(request);
     const response = await this.client.post<BookSlot>('/v1/book', validatedRequest);
     return response.data;
+  }
+
+  /**
+   * List the authenticated user's outbound webhooks
+   */
+  async listWebhooks(): Promise<Webhook[]> {
+    const response = await this.client.get('/v1/webhooks');
+    const data = response.data;
+    // the list endpoint is paginated ({ results }); tolerate a bare array too
+    return Array.isArray(data) ? data : (data?.results ?? []);
+  }
+
+  /**
+   * Create (no id) or update (with id) one of the user's webhooks
+   */
+  async setWebhook(request: SetWebhookRequest): Promise<Webhook> {
+    const { id, ...body } = SetWebhookRequestSchema.parse(request);
+    if (id) {
+      const response = await this.client.patch<Webhook>(`/v1/webhooks/${id}`, body);
+      return response.data;
+    }
+    const response = await this.client.post<Webhook>('/v1/webhooks', body);
+    return response.data;
+  }
+
+  /**
+   * Delete one of the user's webhooks by id
+   */
+  async deleteWebhook(id: number): Promise<void> {
+    await this.client.delete(`/v1/webhooks/${id}`);
   }
 
   /**

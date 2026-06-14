@@ -75,3 +75,26 @@ export type ApiResponse<T> = T | ApiError;
 export interface MeetbotConfig {
   authToken?: string | undefined;
 }
+
+export interface Webhook {
+  id: number;
+  description: string;
+  webhook_url: string;
+  coverage: string;
+  scope: string;
+  pages: number[];
+  is_active: boolean;
+  shared_secret?: string | null;
+  created?: string;
+  updated?: string;
+}
+
+export interface SetWebhookRequest {
+  id?: number | undefined;
+  webhook_url?: string | undefined;
+  description?: string | undefined;
+  coverage?: 'all' | 'selected' | undefined;
+  scope?: 'self' | 'team' | undefined;
+  pages?: number[] | undefined;
+  is_active?: boolean | undefined;
+}

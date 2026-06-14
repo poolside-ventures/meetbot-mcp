@@ -14,7 +14,7 @@ export class MeetbotMCPServer {
     this.server = new Server(
       {
         name: 'meetbot-mcp',
-        version: '1.2.10',
+        version: '1.3.0',
       },
       {
         // Declare the tools capability, otherwise the SDK rejects the
@@ -130,6 +130,72 @@ export class MeetbotMCPServer {
               properties: {},
             },
           },
+          {
+            name: 'list_webhooks',
+            description:
+              "List the authenticated user's outbound booking webhooks (fired on booking_received, booking_rescheduled and booking_cancelled)",
+            inputSchema: {
+              type: 'object',
+              properties: {},
+            },
+          },
+          {
+            name: 'set_webhook',
+            description:
+              'Create or update an outbound booking webhook. Omit id to create (webhook_url required); pass id to update. Meet.bot POSTs a JWT-signed (HS256) JSON payload to the URL on each booking event.',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                id: {
+                  type: 'number',
+                  description: 'Webhook id to update; omit to create a new one',
+                },
+                webhook_url: {
+                  type: 'string',
+                  description: 'HTTPS URL we POST booking events to (required when creating)',
+                },
+                description: {
+                  type: 'string',
+                  description: 'Optional label for the webhook',
+                },
+                coverage: {
+                  type: 'string',
+                  enum: ['all', 'selected'],
+                  description:
+                    "'all' (default) fires for every page including ones created later; 'selected' only for the pages in `pages`",
+                },
+                scope: {
+                  type: 'string',
+                  enum: ['self', 'team'],
+                  description:
+                    "'self' (default) your own pages; 'team' (team admins only) also fires for teammates' bookings",
+                },
+                pages: {
+                  type: 'array',
+                  items: { type: 'number' },
+                  description: "Page ids to cover when coverage='selected'",
+                },
+                is_active: {
+                  type: 'boolean',
+                  description: 'Whether the webhook is active (default true)',
+                },
+              },
+            },
+          },
+          {
+            name: 'delete_webhook',
+            description: "Delete one of the authenticated user's webhooks by id",
+            inputSchema: {
+              type: 'object',
+              properties: {
+                id: {
+                  type: 'number',
+                  description: 'The webhook id to delete',
+                },
+              },
+              required: ['id'],
+            },
+          },
         ],
       };
     });
@@ -154,6 +220,15 @@ export class MeetbotMCPServer {
 
           case 'health_check':
             return await this.handleHealthCheck(args);
+
+          case 'list_webhooks':
+            return await this.handleListWebhooks(args);
+
+          case 'set_webhook':
+            return await this.handleSetWebhook(args);
+
+          case 'delete_webhook':
+            return await this.handleDeleteWebhook(args);
 
           default:
             throw new Error(`Unknown tool: ${name}`);
@@ -260,6 +335,72 @@ export class MeetbotMCPServer {
           text: isHealthy
             ? '✅ Meet.bot API client is healthy and can connect to the API.'
             : '❌ Meet.bot API client cannot connect to the API. Please check your configuration.',
+        },
+      ],
+    };
+  }
+
+  private async handleListWebhooks(_args: any): Promise<any> {
+    if (!this.client) {
+      throw new Error('Meet.bot client not configured. Set MEETBOT_AUTH_TOKEN when running the server (stdio mode), or use the HTTP server with Authorization: Bearer <token> header.');
+    }
+
+    const webhooks = await this.client.listWebhooks();
+    if (webhooks.length === 0) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: 'No webhooks configured yet. Use set_webhook to add one.',
+          },
+        ],
+      };
+    }
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Found ${webhooks.length} webhook(s):\n\n${webhooks
+            .map(
+              (webhook) =>
+                `• #${webhook.id} ${webhook.description || '(unnamed)'} -> ${webhook.webhook_url}\n  coverage: ${webhook.coverage}, scope: ${webhook.scope}, active: ${webhook.is_active}`
+            )
+            .join('\n')}`,
+        },
+      ],
+    };
+  }
+
+  private async handleSetWebhook(args: any): Promise<any> {
+    if (!this.client) {
+      throw new Error('Meet.bot client not configured. Set MEETBOT_AUTH_TOKEN when running the server (stdio mode), or use the HTTP server with Authorization: Bearer <token> header.');
+    }
+
+    const webhook = await this.client.setWebhook(args);
+    const secretLine = webhook.shared_secret
+      ? `\nShared secret (verify HS256 JWT signatures with this): ${webhook.shared_secret}`
+      : '';
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Webhook saved (#${webhook.id}).\nURL: ${webhook.webhook_url}\nCoverage: ${webhook.coverage}, Scope: ${webhook.scope}, Active: ${webhook.is_active}${secretLine}`,
+        },
+      ],
+    };
+  }
+
+  private async handleDeleteWebhook(args: any): Promise<any> {
+    if (!this.client) {
+      throw new Error('Meet.bot client not configured. Set MEETBOT_AUTH_TOKEN when running the server (stdio mode), or use the HTTP server with Authorization: Bearer <token> header.');
+    }
+
+    await this.client.deleteWebhook(args.id);
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `Webhook #${args.id} deleted.`,
         },
       ],
     };

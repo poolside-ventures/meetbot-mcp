@@ -14,6 +14,7 @@ You have access to the Meet.bot MCP server (mcp.meet.bot). Use it to help users 
 - User wants a booking link to send to someone
 - User asks to see their scheduling pages
 - User mentions "meet.bot" or asks about their calendar availability
+- User wants to be notified when meetings are booked, rescheduled, or cancelled, or to wire bookings into another system (webhooks)
 
 ## Authentication
 The Meet.bot MCP server requires a Bearer token. If the user has not configured one, ask them for their Meet.bot API key before proceeding.
@@ -38,6 +39,13 @@ The Meet.bot MCP server requires a Bearer token. If the user has not configured 
 
 ### Handling archived pages
 Scheduling pages with "archived" in the URL or name are inactive. Skip them and only present active pages to the user.
+
+### Managing webhooks
+Webhooks notify an external URL the instant a meeting is booked, rescheduled, or cancelled (events: `booking_received`, `booking_rescheduled`, `booking_cancelled`). Meet.bot POSTs a JWT-signed (HS256) JSON payload to the URL.
+1. Call list_webhooks to show the user's existing webhooks
+2. Call set_webhook with a webhook_url to create one (omit id) or with an id to update one. Coverage defaults to "all" (every page, including ones created later); use "selected" with page ids for specific pages. Only team admins can use scope "team" (fires for teammates' bookings too)
+3. set_webhook returns a shared secret on create — show it to the user once and tell them to store it; it's used to verify the JWT signature on each event
+4. Call delete_webhook with an id to remove one
 
 ## Tips
 - Always confirm with the user before calling book_meeting - bookings cannot be cancelled via this server

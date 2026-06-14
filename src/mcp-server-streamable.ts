@@ -18,7 +18,7 @@ export class MeetbotMCPStreamable {
   constructor() {
     this.server = new McpServer({
       name: 'meetbot-mcp',
-      version: '1.2.9',
+      version: '1.3.0',
       description: 'Meet.bot MCP Server for scheduling and booking',
     });
 
@@ -225,6 +225,110 @@ export class MeetbotMCPStreamable {
         ],
       };
     });
+
+    // List webhooks tool
+    this.server.registerTool('list_webhooks', {
+      title: 'List Webhooks',
+      description: "List the authenticated user's outbound booking webhooks (fired on booking_received, booking_rescheduled and booking_cancelled)",
+      inputSchema: {},
+      annotations: MeetbotMCPStreamable.TOOL_ANNOTATIONS,
+    }, async (_, extra) => {
+      if (!extra.sessionId) {
+        throw new Error('Session ID is required');
+      }
+
+      const client = this.clients.get(extra.sessionId);
+      if (!client) {
+        throw new Error('Meet.bot client not configured. Provide an Authorization: Bearer <token> header when connecting to the MCP server.');
+      }
+
+      const webhooks = await client.listWebhooks();
+      if (webhooks.length === 0) {
+        return {
+          content: [{ type: 'text', text: 'No webhooks configured yet. Use set_webhook to add one.' }],
+        };
+      }
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Found ${webhooks.length} webhook(s):\n\n${webhooks
+              .map(
+                (webhook) =>
+                  `• #${webhook.id} ${webhook.description || '(unnamed)'} -> ${webhook.webhook_url}\n  coverage: ${webhook.coverage}, scope: ${webhook.scope}, active: ${webhook.is_active}`
+              )
+              .join('\n')}`,
+          },
+        ],
+      };
+    });
+
+    // Set webhook tool (create or update)
+    this.server.registerTool('set_webhook', {
+      title: 'Set Webhook',
+      description: 'Create or update an outbound booking webhook. Omit id to create (webhook_url required); pass id to update. Meet.bot POSTs a JWT-signed (HS256) JSON payload to the URL on each booking event.',
+      inputSchema: {
+        id: z.number().optional().describe('Webhook id to update; omit to create a new one'),
+        webhook_url: z.string().optional().describe('HTTPS URL we POST booking events to (required when creating)'),
+        description: z.string().optional().describe('Optional label for the webhook'),
+        coverage: z.enum(['all', 'selected']).optional().describe("'all' (default) fires for every page including ones created later; 'selected' only for the pages in `pages`"),
+        scope: z.enum(['self', 'team']).optional().describe("'self' (default) your own pages; 'team' (team admins only) also fires for teammates' bookings"),
+        pages: z.array(z.number()).optional().describe("Page ids to cover when coverage='selected'"),
+        is_active: z.boolean().optional().describe('Whether the webhook is active (default true)'),
+      },
+      annotations: MeetbotMCPStreamable.TOOL_ANNOTATIONS,
+    }, async (args, extra) => {
+      if (!extra.sessionId) {
+        throw new Error('Session ID is required');
+      }
+
+      const client = this.clients.get(extra.sessionId);
+      if (!client) {
+        throw new Error('Meet.bot client not configured. Provide an Authorization: Bearer <token> header when connecting to the MCP server.');
+      }
+
+      const webhook = await client.setWebhook(args);
+      const secretLine = webhook.shared_secret
+        ? `\nShared secret (verify HS256 JWT signatures with this): ${webhook.shared_secret}`
+        : '';
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Webhook saved (#${webhook.id}).\nURL: ${webhook.webhook_url}\nCoverage: ${webhook.coverage}, Scope: ${webhook.scope}, Active: ${webhook.is_active}${secretLine}`,
+          },
+        ],
+      };
+    });
+
+    // Delete webhook tool
+    this.server.registerTool('delete_webhook', {
+      title: 'Delete Webhook',
+      description: "Delete one of the authenticated user's webhooks by id",
+      inputSchema: {
+        id: z.number().describe('The webhook id to delete'),
+      },
+      annotations: MeetbotMCPStreamable.TOOL_ANNOTATIONS,
+    }, async ({ id }, extra) => {
+      if (!extra.sessionId) {
+        throw new Error('Session ID is required');
+      }
+
+      const client = this.clients.get(extra.sessionId);
+      if (!client) {
+        throw new Error('Meet.bot client not configured. Provide an Authorization: Bearer <token> header when connecting to the MCP server.');
+      }
+
+      await client.deleteWebhook(id);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Webhook #${id} deleted.`,
+          },
+        ],
+      };
+    });
   }
 
   private setupPromptHandlers(): void {
@@ -403,7 +507,7 @@ export class MeetbotMCPStreamable {
     const serverCard = {
       serverInfo: {
         name: 'meetbot-mcp',
-        version: '1.2.9',
+        version: '1.3.0',
         description: 'Meet.bot MCP Server for scheduling and booking. Lets AI agents check availability, get scheduling page info, and book meetings on your behalf.',
       },
       authentication: {
@@ -478,6 +582,48 @@ export class MeetbotMCPStreamable {
           title: 'Health Check',
           description: 'Check if the Meet.bot API client is healthy and the Bearer token is valid',
           inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+          annotations: toolAnnotations,
+        },
+        {
+          name: 'list_webhooks',
+          title: 'List Webhooks',
+          description: "List the authenticated user's outbound booking webhooks (fired on booking_received, booking_rescheduled and booking_cancelled)",
+          inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+          annotations: toolAnnotations,
+        },
+        {
+          name: 'set_webhook',
+          title: 'Set Webhook',
+          description: 'Create or update an outbound booking webhook. Omit id to create (webhook_url required); pass id to update. Meet.bot POSTs a JWT-signed (HS256) JSON payload to the URL on each booking event.',
+          inputSchema: {
+            type: 'object',
+            description: 'Parameters for creating or updating a booking webhook.',
+            properties: {
+              id: { type: 'number', description: 'Webhook id to update; omit to create a new one' },
+              webhook_url: { type: 'string', description: 'HTTPS URL we POST booking events to (required when creating)' },
+              description: { type: 'string', description: 'Optional label for the webhook' },
+              coverage: { type: 'string', enum: ['all', 'selected'], description: "'all' (default) fires for every page including ones created later; 'selected' only for the pages in `pages`" },
+              scope: { type: 'string', enum: ['self', 'team'], description: "'self' (default) your own pages; 'team' (team admins only) also fires for teammates' bookings" },
+              pages: { type: 'array', items: { type: 'number' }, description: "Page ids to cover when coverage='selected'" },
+              is_active: { type: 'boolean', description: 'Whether the webhook is active (default true)' },
+            },
+            additionalProperties: false,
+          },
+          annotations: toolAnnotations,
+        },
+        {
+          name: 'delete_webhook',
+          title: 'Delete Webhook',
+          description: "Delete one of the authenticated user's webhooks by id",
+          inputSchema: {
+            type: 'object',
+            description: 'Parameters for deleting a webhook.',
+            properties: {
+              id: { type: 'number', description: 'The webhook id to delete' },
+            },
+            required: ['id'],
+            additionalProperties: false,
+          },
           annotations: toolAnnotations,
         },
       ],

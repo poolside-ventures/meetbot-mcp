@@ -85,3 +85,29 @@ export type ValidatedBookSlotRequest = z.infer<typeof BookSlotRequestSchema>;
 export type ValidatedGetSlotsParams = z.infer<typeof GetSlotsParamsSchema>;
 export type ValidatedGetInfoParams = z.infer<typeof GetInfoParamsSchema>;
 export type ValidatedMeetbotConfig = z.infer<typeof MeetbotConfigSchema>;
+
+export const WebhookSchema = z.object({
+  id: z.number(),
+  description: z.string(),
+  webhook_url: z.string(),
+  coverage: z.string(),
+  scope: z.string(),
+  pages: z.array(z.number()),
+  is_active: z.boolean(),
+  shared_secret: z.string().nullable().optional(),
+  created: z.string().optional(),
+  updated: z.string().optional(),
+});
+
+export const SetWebhookRequestSchema = z.object({
+  id: z.number().int().positive().optional(),
+  webhook_url: z.string().url().optional(),
+  description: z.string().optional(),
+  coverage: z.enum(['all', 'selected']).optional(),
+  scope: z.enum(['self', 'team']).optional(),
+  pages: z.array(z.number().int()).optional(),
+  is_active: z.boolean().optional(),
+});
+
+export type ValidatedWebhook = z.infer<typeof WebhookSchema>;
+export type ValidatedSetWebhookRequest = z.infer<typeof SetWebhookRequestSchema>;

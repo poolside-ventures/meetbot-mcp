@@ -104,6 +104,27 @@ await health_check();
 // Verifies API connectivity using the /v1/pages endpoint
 ```
 
+#### Webhooks
+
+Get notified the moment a meeting is booked, rescheduled, or cancelled. Meet.bot POSTs a JWT-signed (HS256) JSON payload — the same contract as the partner webhook — to your URL for each event (`booking_received`, `booking_rescheduled`, `booking_cancelled`).
+
+```typescript
+// List your webhooks
+await list_webhooks();
+
+// Create (omit id) or update (pass id) a webhook
+await set_webhook({
+  webhook_url: "https://your-app.example.com/meetbot-hook",
+  description: "CRM sync",
+  coverage: "all",   // or "selected" with pages: [<page id>, ...]
+  scope: "self"      // team admins can use "team" to also receive teammates' bookings
+});
+// Returns the webhook including the shared secret used to verify the signature.
+
+// Delete a webhook
+await delete_webhook({ id: 123 });
+```
+
 ## Deployment Options
 
 The MCP server can be run in two modes:
@@ -236,13 +257,16 @@ This MCP server can be integrated with AI assistants like Claude, ChatGPT, and o
 
 #### Available MCP Tools
 
-The server exposes 5 tools for AI assistants:
+The server exposes 8 tools for AI assistants:
 
 1. **`get_scheduling_pages`** - List all scheduling pages
 2. **`get_page_info`** - Get page details
 3. **`get_available_slots`** - Find available time slots
 4. **`book_meeting`** - Book a meeting
 5. **`health_check`** - Verify API connectivity using /v1/pages endpoint
+6. **`list_webhooks`** - List your outbound booking webhooks
+7. **`set_webhook`** - Create or update a webhook (booking_received / booking_rescheduled / booking_cancelled)
+8. **`delete_webhook`** - Delete a webhook
 
 Authentication is provided by the connection (Bearer token in HTTP header for remote, or `MEETBOT_AUTH_TOKEN` for local stdio)—there is no separate configure tool.
 
